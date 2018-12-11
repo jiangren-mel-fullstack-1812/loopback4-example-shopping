@@ -11,6 +11,8 @@ export {ShoppingApplication, PackageInfo, PackageKey} from './application';
 export async function main(options?: ApplicationConfig) {
   const app = new ShoppingApplication(options);
 
+  // app.component(AuthenticationComponent);
+
   await app.boot();
   await app.start();
 
