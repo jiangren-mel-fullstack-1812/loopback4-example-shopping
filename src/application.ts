@@ -14,7 +14,6 @@ import {
   AuthenticationBindings,
   AuthenticationComponent,
 } from '@loopback/authentication';
-import {JWTProvider} from './providers';
 import {StrategyResolverProvider} from './providers/strategy.resolver.provider';
 
 /**

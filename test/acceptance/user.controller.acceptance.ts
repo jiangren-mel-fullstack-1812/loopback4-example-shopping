@@ -10,8 +10,7 @@ import {UserRepository, OrderRepository} from '../../src/repositories';
 import {MongoDataSource} from '../../src/datasources';
 import {setupApplication} from './helper';
 import {createRecommendationServer} from '../../recommender';
-import {Server, ServerResponse} from 'http';
-import {authenticate} from '@loopback/authentication';
+import {Server} from 'http';
 const recommendations = require('../../recommender/recommendations.json');
 
 describe('UserController', () => {
@@ -121,7 +120,7 @@ describe('UserController', () => {
     // since the REST API returns a string for the id property.
     newUser.id = newUser.id.toString();
     await client
-      .post('/Users/login')
+      .post('/users/login')
       .send({username: 'the-username', password: 'the-password'})
       .expect(200)
       .end(onResponse);
