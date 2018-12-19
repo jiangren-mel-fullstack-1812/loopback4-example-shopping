@@ -15,6 +15,7 @@ import {
   AuthenticationComponent,
 } from '@loopback/authentication';
 import {JWTProvider} from './providers';
+import {StrategyResolverProvider} from './providers/strategy.resolver.provider';
 
 /**
  * Information from package.json
@@ -34,12 +35,13 @@ export class ShoppingApplication extends BootMixin(
   constructor(options?: ApplicationConfig) {
     super(options);
 
-    this.bind(AuthenticationBindings.STRATEGY).toProvider(JWTProvider);
-
     // Bind package.json to the application context
     this.bind(PackageKey).to(pkg);
 
     this.component(AuthenticationComponent);
+    this.bind(AuthenticationBindings.STRATEGY).toProvider(
+      StrategyResolverProvider,
+    );
 
     // Set up the custom sequence
     this.sequence(MySequence);

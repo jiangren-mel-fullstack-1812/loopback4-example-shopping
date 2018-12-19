@@ -50,6 +50,9 @@ export class JWTProvider implements Provider<AuthenticateFn | undefined> {
     //   request.headers['x-access-token'];
     const token = 'not the right token';
 
+    // do we allow session
+    // if yes, then sign in function should store the token in the session
+
     if (token) {
       try {
         await verifyAsync(token, SECRET);
