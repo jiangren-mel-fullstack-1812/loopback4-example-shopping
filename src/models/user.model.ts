@@ -5,6 +5,7 @@
 
 import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Order} from './order.model';
+import {AccessToken} from './access-token.model';
 
 @model()
 export class User extends Entity {
@@ -38,6 +39,9 @@ export class User extends Entity {
 
   @hasMany(() => Order)
   orders: Order[];
+
+  @hasMany(() => AccessToken)
+  accesstokens: AccessToken[];
 
   constructor(data?: Partial<User>) {
     super(data);

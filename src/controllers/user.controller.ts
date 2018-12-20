@@ -3,16 +3,18 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {repository} from '@loopback/repository';
-import {post, param, get, requestBody, HttpErrors} from '@loopback/rest';
-import {User, Product} from '../models';
-import {UserRepository} from '../repositories';
-import {hash} from 'bcryptjs';
-import {promisify} from 'util';
+import { repository } from '@loopback/repository';
+import { post, param, get, requestBody, HttpErrors } from '@loopback/rest';
+import { User, Product } from '../models';
+import { UserRepository } from '../repositories';
+import { hash } from 'bcryptjs';
+import { promisify } from 'util';
 import * as isemail from 'isemail';
-import {RecommenderService} from '../services/recommender.service';
-import {inject} from '@loopback/core';
-import {authenticate} from '@loopback/authentication';
+import { RecommenderService } from '../services/recommender.service';
+import { inject } from '@loopback/core';
+import { authenticate } from '@loopback/authentication';
+const jwt = require('jsonwebtoken');
+const signAsync = promisify(jwt.sign);
 
 const hashAsync = promisify(hash);
 
@@ -21,7 +23,7 @@ export class UserController {
     @repository(UserRepository) public userRepository: UserRepository,
     @inject('services.RecommenderService')
     public recommender: RecommenderService,
-  ) {}
+  ) { }
 
   @post('/users')
   async create(@requestBody() user: User): Promise<User> {
@@ -63,7 +65,7 @@ export class UserController {
   @authenticate('jwt')
   async findById(@param.path.string('userId') userId: string): Promise<User> {
     return this.userRepository.findById(userId, {
-      fields: {password: false},
+      fields: { password: false },
     });
   }
 
@@ -91,7 +93,7 @@ export class UserController {
   }
 
   @post('/users/login')
-  async login(@requestBody() user: User): Promise<User> {
+  async login(@requestBody() user: User): Promise<string | undefined> {
     // Validate Email
     if (!isemail.validate(user.email)) {
       throw new HttpErrors.UnprocessableEntity('invalid email');
@@ -104,12 +106,18 @@ export class UserController {
       );
     }
 
-    // Salt + Hash Password
-    user.password = await hashAsync(user.password, 10);
+    // Check if user exists
+    const foundUser = await this.userRepository.findOne({ where: { email: user.email, password: user.password } });
 
-    // Save & Return Result
-    const savedUser = await this.userRepository.create(user);
-    delete savedUser.password;
-    return savedUser;
+    let token = undefined;
+
+    if (foundUser) {
+      delete foundUser.password;
+
+      // Generate user token using JWT
+      token = await signAsync(foundUser.toJSON(), 'secretforjwt', { expiresIn: 300 });
+    }
+
+    return token;
   }
 }

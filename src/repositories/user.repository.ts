@@ -18,15 +18,20 @@ export class UserRepository extends DefaultCrudRepository<
   typeof User.prototype.id
 > {
   public orders: HasManyRepositoryFactory<Order, typeof User.prototype.id>;
+  // public accesstokens: HasOneRepositoryFactory<AccessToken, typeof User.prototype.id>;
 
   constructor(
     @inject('datasources.mongo') protected datasource: juggler.DataSource,
-    @repository(OrderRepository) protected orderRepository: OrderRepository,
+    @repository(OrderRepository) protected orderRepository: OrderRepository, // @repository(AccessTokenRepository) protected accessTokenRepository: AccessTokenRepository,
   ) {
     super(User, datasource);
     this.orders = this._createHasManyRepositoryFactoryFor(
       'orders',
       async () => orderRepository,
     );
+    // this.accesstokens = this.createHasOneRepositoryFactoryFor(
+    //   'accesstokens',
+    //   async () => accessTokenRepository,
+    // );
   }
 }
